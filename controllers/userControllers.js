@@ -26,23 +26,28 @@ if (!validator.isStrongPassword(password)) {
 
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
-
   try {
     const user = await User.findOne({ username });
-
     if (!user) {
       return res.status(404).send({ message: 'User not found' });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
-
     if (!passwordMatch) {
       return res.status(401).send({ message: 'Invalid login credentials' });
     }
 
     const payload = { userId: user._id };
     const token = generateToken(payload);
-    res.cookie('token', token, { httpOnly: true });
+
+    // ✅ Updated cookie settings for cross-domain
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // true in production
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 6 * 60 * 60 * 1000 // 6 hours
+    });
+
     res.status(200).json({ message: 'Login successful' });
   } catch (error) {
     console.log(error);
@@ -50,9 +55,13 @@ const loginUser = async (req, res) => {
   }
 };
 
-const logoutUser = (req, res) => { // ✅ Remove async (unecessary here)
+const logoutUser = (req, res) => {
   try {
-    res.clearCookie('token', { httpOnly: true });
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
     res.status(200).json({ message: 'Logout successful' });
   } catch (error) {
     console.log(error);
