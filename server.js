@@ -17,7 +17,7 @@ const app = express();
 
 // 🔹 Middleware
 app.use(cors({
-  origin: `${process.env.FRONTEND_URL}`,
+  origin: process.env.FRONTEND_URL,
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
@@ -36,7 +36,7 @@ connectToDatabase();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: `${process.env.FRONTEND_URL}`,
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "DELETE"]
   }
 });
