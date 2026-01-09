@@ -90,7 +90,7 @@ const requestPasswordReset = async (req, res) => {
     );
 
     // ✅ Update this URL to match your frontend
-    const resetURL = `http://localhost:3000/reset-password?id=${user._id}&token=${token}`;
+    const resetURL = `${process.env.FRONTEND_URL}/reset-password?id=${user._id}&token=${token}`;
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
