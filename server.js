@@ -99,7 +99,7 @@ async function checkAndEmitOverdueTasks(socket) {
   }
 }
 
-// const PORT = process.env.FRONTEND_URL || 3000;
-// server.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
+const PORT = process.env.FRONTEND_URL || 3000;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
