@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer'; // ✅ Added
 import { generateToken} from '../middleware/auth.js'; // ✅ Import secretKey too
 import {secretKey} from '../middleware/config.js'; // ✅ New import for secret key
 import validator from "validator";
-
+import { Resend } from 'resend';
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
   if (!username || !email || !password) {
@@ -78,7 +78,7 @@ const getUsers = async (req, res) => {
     res.status(500).send({ message: 'An error occurred!!' });
   }
 };
-
+//FIRST
 // ✅ FIXED: Request password reset
 // const requestPasswordReset = async (req, res) => {
 //   const { email } = req.body;
@@ -129,10 +129,72 @@ const getUsers = async (req, res) => {
 // };
 
 
+//SECOND
+// const requestPasswordReset = async (req, res) => {
+//   const { email } = req.body;
+
+//   try {
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(404).json({ message: "User doesn't exist" });
+//     }
+
+//     const secret = secretKey + user.password;
+//     const token = jwt.sign(
+//       { id: user._id, email: user.email },
+//       secret,
+//       { expiresIn: '1h' }
+//     );
+
+//     const resetURL = `${process.env.FRONTEND_URL}/reset-password?id=${user._id}&token=${token}`;
+
+//     // ✅ Add these settings for better Gmail compatibility
+//     const transporter = nodemailer.createTransport({
+//       service: 'gmail',
+//       auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS, // App Password here
+//       },
+//       tls: {
+//         rejectUnauthorized: false // Add this for some hosting environments
+//       }
+//     });
+
+//     const mailOptions = {
+//       to: user.email,
+//       from: process.env.EMAIL_USER,
+//       subject: 'Password Reset Request',
+//       html: `
+//         <h3>Password Reset Request</h3>
+//         <p>You are receiving this because you (or someone else) have requested to reset your password.</p>
+//         <p>Please click on the following link to complete the process:</p>
+//         <a href="${resetURL}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; display: inline-block; margin: 10px 0;">Reset Password</a>
+//         <p>Or copy and paste this link in your browser:</p>
+//         <p>${resetURL}</p>
+//         <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+//         <p><strong>This link will expire in 1 hour.</strong></p>
+//       `,
+//     };
+
+//     // ✅ Add timeout and better error handling
+//     await transporter.sendMail(mailOptions);
+
+//     res.status(200).json({ message: 'Password reset link sent to your email' });
+//   } catch (error) {
+//     console.error('❌ Email Error:', error); // Better logging
+//     res.status(500).json({ 
+//       message: 'Failed to send email', 
+//       error: error.message 
+//     });
+//   }
+// };
+
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const requestPasswordReset = async (req, res) => {
   const { email } = req.body;
-
+  
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -148,46 +210,30 @@ const requestPasswordReset = async (req, res) => {
 
     const resetURL = `${process.env.FRONTEND_URL}/reset-password?id=${user._id}&token=${token}`;
 
-    // ✅ Add these settings for better Gmail compatibility
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // App Password here
-      },
-      tls: {
-        rejectUnauthorized: false // Add this for some hosting environments
-      }
-    });
-
-    const mailOptions = {
+    await resend.emails.send({
+      from: 'onboarding@resend.dev', // or your verified domain
       to: user.email,
-      from: process.env.EMAIL_USER,
       subject: 'Password Reset Request',
       html: `
         <h3>Password Reset Request</h3>
-        <p>You are receiving this because you (or someone else) have requested to reset your password.</p>
-        <p>Please click on the following link to complete the process:</p>
-        <a href="${resetURL}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; display: inline-block; margin: 10px 0;">Reset Password</a>
-        <p>Or copy and paste this link in your browser:</p>
-        <p>${resetURL}</p>
-        <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
-        <p><strong>This link will expire in 1 hour.</strong></p>
+        <p>Click the link below to reset your password:</p>
+        <a href="${resetURL}">Reset Password</a>
+        <p>Link: ${resetURL}</p>
+        <p>Expires in 1 hour.</p>
       `,
-    };
-
-    // ✅ Add timeout and better error handling
-    await transporter.sendMail(mailOptions);
+    });
 
     res.status(200).json({ message: 'Password reset link sent to your email' });
   } catch (error) {
-    console.error('❌ Email Error:', error); // Better logging
-    res.status(500).json({ 
-      message: 'Failed to send email', 
-      error: error.message 
+    console.error('❌ Email Error:', error);
+    res.status(500).json({
+      message: 'Failed to send email',
+      error: error.message
     });
   }
 };
+
+
 
 // ✅ FIXED: Reset password
 const resetPassword = async (req, res) => {
