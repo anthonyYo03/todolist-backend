@@ -1,6 +1,6 @@
 import Notification from "../models/notification.model.js";
 
-// 1️⃣ Get all visible notifications (newest first)
+//Get all visible notifications (newest first)
 const getNotification = async (req, res) => {
   const userId = req.userId;
   try {
@@ -12,7 +12,7 @@ const getNotification = async (req, res) => {
   }
 };
 
-// 2️⃣ Get unread notification count (only visible)
+//Get unread notification count (only visible)
 const notificationCounter = async (req, res) => {
   const userId = req.userId;
   try {
@@ -27,7 +27,7 @@ const notificationCounter = async (req, res) => {
   }
 };
 
-// 3️⃣ Mark a single notification as read (only if visible)
+//Mark a single notification as read (only if visible)
 const markAsRead = async (req, res) => {
   const { id } = req.params;
   const userId = req.userId;
@@ -48,7 +48,7 @@ const markAsRead = async (req, res) => {
   }
 };
 
-// 4️⃣ Clear all notifications (mark as hidden)
+//Clear all notifications (mark as hidden)
 const clearNotifications = async (req, res) => {
   const userId = req.userId;
 
@@ -68,7 +68,7 @@ const clearNotifications = async (req, res) => {
   }
 };
 
-// 5️⃣ Create a new notification
+//Create a new notification
 const createNotification = async (req, res) => {
   const { userId, taskId, type, message } = req.body;
 

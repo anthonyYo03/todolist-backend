@@ -11,7 +11,7 @@ const notificationSchema = new Schema({
    createdAt: { type: Date, default: Date.now },
  isHidden: {
     type: Boolean,
-    default: false // << when user “clears” task, set this to true
+    default: false //when user “clears” task, set this to true
   }
 });
 notificationSchema.index({ userId: 1, isRead: 1 });

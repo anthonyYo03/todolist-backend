@@ -1,9 +1,9 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'; // ✅ Added
-import nodemailer from 'nodemailer'; // ✅ Added
-import { generateToken} from '../middleware/auth.js'; // ✅ Import secretKey too
-import {secretKey} from '../middleware/config.js'; // ✅ New import for secret key
+import jwt from 'jsonwebtoken';
+// import nodemailer from 'nodemailer';
+import { generateToken} from '../middleware/auth.js';
+import {secretKey} from '../middleware/config.js';
 import validator from "validator";
 import { Resend } from 'resend';
 const registerUser = async (req, res) => {
@@ -40,7 +40,7 @@ const loginUser = async (req, res) => {
     const payload = { userId: user._id };
     const token = generateToken(payload);
 
-    // ✅ Updated cookie settings for cross-domain
+    //Cookie settings for cross-domain
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // true in production
@@ -79,7 +79,7 @@ const getUsers = async (req, res) => {
   }
 };
 //FIRST
-// ✅ FIXED: Request password reset
+//Request password reset
 // const requestPasswordReset = async (req, res) => {
 //   const { email } = req.body;
 
@@ -98,7 +98,7 @@ const getUsers = async (req, res) => {
 //       { expiresIn: '1h' }
 //     );
 
-//     // ✅ Update this URL to match your frontend
+// Update this URL to match your frontend
 //     const resetURL = `${process.env.FRONTEND_URL}/reset-password?id=${user._id}&token=${token}`;
 
 //     const transporter = nodemailer.createTransport({
@@ -148,12 +148,12 @@ const getUsers = async (req, res) => {
 
 //     const resetURL = `${process.env.FRONTEND_URL}/reset-password?id=${user._id}&token=${token}`;
 
-//     // ✅ Add these settings for better Gmail compatibility
+// Add these settings for better Gmail compatibility
 //     const transporter = nodemailer.createTransport({
 //       service: 'gmail',
 //       auth: {
 //         user: process.env.EMAIL_USER,
-//         pass: process.env.EMAIL_PASS, // App Password here
+//         pass: process.env.EMAIL_PASS,
 //       },
 //       tls: {
 //         rejectUnauthorized: false // Add this for some hosting environments
@@ -176,7 +176,7 @@ const getUsers = async (req, res) => {
 //       `,
 //     };
 
-//     // ✅ Add timeout and better error handling
+//     //Add timeout and better error handling
 //     await transporter.sendMail(mailOptions);
 
 //     res.status(200).json({ message: 'Password reset link sent to your email' });
@@ -237,8 +237,8 @@ const requestPasswordReset = async (req, res) => {
 
 // ✅ FIXED: Reset password
 const resetPassword = async (req, res) => {
-  const { id, token } = req.query; // ✅ Get from query params (from URL)
-  const { password } = req.body; // ✅ Get new password from request body
+  const { id, token } = req.query; //Get from query params (from URL)
+  const { password } = req.body; //Get new password from request body
 
 if (!validator.isStrongPassword(password)) {
   return res.status(400).json({ message: "Password is too weak" });
@@ -254,7 +254,7 @@ if (!validator.isStrongPassword(password)) {
       return res.status(400).json({ message: 'Invalid reset link' });
     }
 
-    // Find the user
+    
     const user = await User.findOne({ _id: id });
     if (!user) {
       return res.status(400).json({ message: 'User does not exist!' });
@@ -269,7 +269,7 @@ if (!validator.isStrongPassword(password)) {
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
-    // Hash the new password
+ 
     const encryptedPassword = await bcrypt.hash(password, 10);
 
     // Update user's password

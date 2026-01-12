@@ -8,7 +8,7 @@ router.post('/login', userControllers.loginUser);
 router.post('/logout', verifyToken, userControllers.logoutUser);
 router.get('/users/:id', verifyToken, userControllers.getUsers);
 
-// ✅ FIXED: Removed verifyToken - users can't be logged in when resetting password!
+//We dont put verifyToken - users can't be logged in when resetting password!
 router.post('/requestPasswordReset', userControllers.requestPasswordReset);
 router.post('/resetPassword', userControllers.resetPassword);
 

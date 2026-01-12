@@ -15,7 +15,7 @@ dotenv.config();
 
 const app = express();
 
-// 🔹 Middleware
+//Middlewares
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// 🔹 Routes
+//Routes
 app.use("/api", userRoutes);
 app.use("/", taskRoutes);
 app.use("/", notificationRoutes);
@@ -55,7 +55,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// ✅ Function to create overdue notifications safely
+//Function to create overdue notifications
 async function createOverdueNotification(task) {
   const exists = await Notification.findOne({
     taskId: task._id,
@@ -74,7 +74,7 @@ async function createOverdueNotification(task) {
   }
 }
 
-// ✅ Function to check overdue tasks and notify clients
+//Function to check overdue tasks and notify clients
 async function checkAndEmitOverdueTasks(socket) {
   try {
     // Get all overdue tasks (pending/in-progress)
@@ -85,13 +85,12 @@ async function checkAndEmitOverdueTasks(socket) {
 
     console.log("✅ Found overdue tasks:", overdueTasks.length);
 
-    // Create notifications in DB if not exists
+    // Create notifications in DB if it does not exist
     for (const task of overdueTasks) {
       await createOverdueNotification(task);
     }
 
-    // Get all notifications for all users and emit (optional: you can filter by user if needed)
-    // Or you can emit only new ones if you want
+    // Get all notifications for all users and emit
     const notifications = await Notification.find({ isHidden: false }).sort({ createdAt: -1 });
 
     socket.emit("refreshNotifications", notifications);

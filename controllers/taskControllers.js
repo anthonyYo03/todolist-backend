@@ -72,7 +72,7 @@ const updateTask = async (req, res) => {
   const { name, description, status, dueDate } = req.body;
   const userId = req.userId;
 
-  // ✅ Only validate and format if dueDate is provided
+  //Only validate and format if dueDate is provided
   let formattedDueDate = dueDate;
   
   if (dueDate) {
@@ -92,7 +92,7 @@ const updateTask = async (req, res) => {
       });
     }
     
-    // ✅ Use the formatted date
+    //Use the formatted date
     formattedDueDate = due;
   }
 
